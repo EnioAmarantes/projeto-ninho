@@ -12,6 +12,38 @@ A inteligência artificial deve ser uma presença discreta e útil: automatizand
 
 ---
 
+                    Projeto Ninho
+
+                           │
+
+         ┌─────────────────┼──────────────────┐
+
+         │                 │                  │
+
+       Frontend         Backend             IoT
+
+         │                 │                  │
+
+         ├──────────── NATS ────────────────┤
+
+                           │
+
+                      PostgreSQL
+
+                           │
+
+                         Redis
+
+                           │
+
+                      Ollama AI
+
+                           │
+
+                    Home Assistant
+
+---
+
 ## Objetivos
 
 * Construir uma plataforma de automação residencial moderna.
