@@ -2,77 +2,103 @@
 
 ## Nossa visão
 
-Acreditamos que uma casa inteligente deve servir às pessoas, e não o contrário.
+A tecnologia deve aproximar pessoas, e não afastá-las.
 
-O Projeto Ninho nasceu para construir um ambiente tecnológico que fortaleça a convivência familiar, respeite a privacidade e reduza a complexidade do dia a dia. A tecnologia deve atuar como uma facilitadora silenciosa, automatizando tarefas repetitivas e oferecendo suporte contextual, sem substituir a presença, a autonomia ou as relações humanas.
+O Projeto Ninho nasce com o propósito de criar um ecossistema inteligente capaz de compreender o ambiente, auxiliar seus moradores e tornar o cotidiano mais seguro, confortável e conectado, sempre preservando a privacidade e mantendo o ser humano no centro das decisões.
 
-Mais do que um sistema de automação residencial, o Projeto Ninho é uma plataforma para integrar inteligência artificial, dispositivos conectados e comunicação familiar em um único ecossistema.
+Mais do que uma plataforma de automação residencial, o Projeto Ninho busca construir uma inteligência ambiental: um sistema capaz de integrar dispositivos, serviços, inteligência artificial e pessoas em um único ecossistema coeso.
 
-## Missão
+A tecnologia deve ser discreta. Deve estar presente quando necessária e praticamente invisível quando tudo estiver funcionando como esperado.
 
-Desenvolver uma plataforma aberta, modular e extensível que permita criar residências inteligentes centradas nas pessoas, com inteligência artificial executando localmente sempre que possível e mantendo o usuário como proprietário de seus dados.
+---
 
-## Valores
+# Missão
 
-* Privacidade por padrão.
-* Controle do usuário sobre seus dados.
-* Arquitetura modular.
-* Segurança desde a concepção.
-* Simplicidade de uso.
-* Evolução incremental.
-* Interoperabilidade.
-* Transparência nas decisões arquiteturais.
+Desenvolver uma plataforma aberta, modular e extensível que permita construir ambientes inteligentes centrados nas pessoas, utilizando inteligência artificial, automação e integração entre dispositivos para simplificar tarefas, facilitar a comunicação e melhorar a qualidade de vida.
 
-## Objetivos estratégicos
+---
 
-### Curto prazo
+# Princípios
 
-* Construir a fundação da plataforma.
-* Estabelecer uma arquitetura sólida.
-* Documentar decisões técnicas.
-* Disponibilizar os primeiros serviços.
+## Pessoas em primeiro lugar
 
-### Médio prazo
+Toda decisão técnica deve beneficiar as pessoas que utilizam o sistema. A tecnologia existe para servir aos moradores, nunca o contrário.
+
+## Privacidade por padrão
+
+Sempre que possível, os dados permanecem sob controle do usuário. O processamento local é priorizado, reduzindo a dependência de serviços externos.
+
+## Local First
+
+A plataforma deve continuar útil mesmo com acesso limitado ou inexistente à Internet. Serviços em nuvem são complementares, não obrigatórios.
+
+## Arquitetura modular
+
+Cada componente deve possuir responsabilidades claras e poder evoluir independentemente.
+
+## Interoperabilidade
+
+O Projeto Ninho deve integrar diferentes fabricantes, protocolos e tecnologias, evitando dependência de soluções proprietárias.
+
+## Segurança desde a concepção
+
+Segurança não é uma funcionalidade adicional. Ela faz parte do projeto desde a arquitetura inicial.
+
+## Evolução incremental
+
+Novas tecnologias devem ser incorporadas apenas quando resolverem problemas reais e agregarem valor ao ecossistema.
+
+## Transparência
+
+As decisões arquiteturais devem ser documentadas por meio de ADRs, permitindo compreender por que cada escolha foi realizada.
+
+---
+
+# Objetivos
+
+## Curto prazo
+
+* Construir uma base arquitetural sólida.
+* Desenvolver a infraestrutura principal da plataforma.
+* Implementar autenticação, gerenciamento de dispositivos e comunicação entre serviços.
+* Estruturar a documentação e os processos de desenvolvimento.
+
+## Médio prazo
 
 * Integrar dispositivos IoT.
-* Desenvolver o núcleo de inteligência artificial.
-* Implementar automações contextuais.
-* Criar interfaces web e mobile.
+* Disponibilizar automações configuráveis.
+* Implementar o núcleo de inteligência artificial.
+* Desenvolver interfaces web, mobile e dispositivos dedicados.
 
-### Longo prazo
+## Longo prazo
 
-Construir um ecossistema capaz de:
+Construir uma plataforma capaz de compreender contexto, aprender preferências, coordenar automações complexas e oferecer experiências personalizadas para diferentes moradores, sempre preservando privacidade e autonomia.
 
-* compreender contexto;
-* aprender preferências dos usuários;
-* coordenar automações complexas;
-* facilitar a comunicação entre familiares;
-* executar modelos de IA localmente;
-* oferecer personas especializadas para diferentes perfis de uso.
+---
 
-## Escopo
+# O que o Projeto Ninho é
 
-O Projeto Ninho busca integrar:
+* Uma plataforma de inteligência ambiental.
+* Um ecossistema de automação residencial.
+* Uma base para integração de dispositivos conectados.
+* Um núcleo de inteligência artificial executado localmente sempre que possível.
+* Um ambiente preparado para comunicação entre pessoas, dispositivos e serviços.
 
-* automação residencial;
-* inteligência artificial;
-* gerenciamento de dispositivos;
-* comunicação entre moradores;
-* monitoramento;
-* automações inteligentes;
-* interfaces físicas dedicadas, como cyberdecks.
+---
 
-## Fora do escopo
+# O que o Projeto Ninho não é
 
-O Projeto Ninho não pretende:
+* Um assistente virtual isolado.
+* Uma plataforma dependente de um único fabricante.
+* Um sistema exclusivamente baseado em nuvem.
+* Uma solução limitada à automação residencial tradicional.
 
-* substituir plataformas de mensagens existentes;
-* armazenar dados pessoais em nuvem por padrão;
-* depender de um único fabricante de dispositivos;
-* restringir a arquitetura a um fornecedor específico de IA ou hardware.
+---
 
-## Visão de longo prazo
+# Filosofia
 
-Queremos que o Projeto Ninho evolua para uma plataforma capaz de acompanhar o crescimento de uma família ao longo dos anos, adaptando-se às necessidades de seus moradores sem abrir mão da privacidade, da transparência e da liberdade tecnológica.
+O Projeto Ninho acredita que tecnologia de qualidade é aquela que desaparece na rotina.
 
-A tecnologia deve estar presente, mas quase invisível: trabalhando em segundo plano para tornar o ambiente mais seguro, acolhedor e inteligente.
+Quando tudo funciona corretamente, os moradores não precisam pensar na tecnologia. Ela apenas está presente, auxiliando discretamente, protegendo informações, automatizando tarefas repetitivas e aproximando pessoas.
+
+Nosso objetivo não é construir a casa mais tecnológica possível, mas a casa mais humana possível utilizando tecnologia.
