@@ -5,11 +5,11 @@ namespace ProjetoNinho.Application.Conversation;
 
 public sealed class ConversationOrchestrator
 {
-    private readonly PromptBuilder _promptBuilder;
+    private readonly PromptCompose _promptBuilder;
     private readonly ILLMProvider _llmProvider;
     
     public ConversationOrchestrator(
-        PromptBuilder promptBuilder, 
+        PromptCompose promptBuilder, 
         ILLMProvider llmProvider)
     {
         _promptBuilder = promptBuilder;

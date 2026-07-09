@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<PromptBuilder>();
+        services.AddScoped<PromptCompose>();
         services.AddScoped<ConversationOrchestrator>();
         services
             .AddHttpClient<ILLMProvider, OllamaProvider>((_, client) =>

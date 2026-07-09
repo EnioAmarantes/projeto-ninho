@@ -1,6 +1,6 @@
 namespace ProjetoNinho.Domain.Conversation;
 
-public sealed class PromptBuilder
+public sealed class PromptCompose
 {
     public string Build(string message)
     {
