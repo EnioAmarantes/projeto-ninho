@@ -1,0 +1,32 @@
+# Build
+bin/
+obj/
+
+# IDE
+.vs/
+.idea/
+
+# VS Code
+.vscode/
+
+# Rider
+*.DotSettings.user
+
+# Coverage
+TestResults/
+coverage/
+
+# Environment
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# Database
+postgres-data/
+redis-data/
+
+# Ollama
+ollama-data/
