@@ -9,3 +9,8 @@ var app = builder.Build();
 app.MapConversationEndpoints();
 
 app.Run();
+
+/// <summary>
+/// Entry point marker exposed for integration tests.
+/// </summary>
+public partial class Program;
