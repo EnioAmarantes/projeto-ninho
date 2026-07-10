@@ -36,14 +36,22 @@ public sealed class OllamaProvider : ILLMProvider
 		CancellationToken cancellationToken = default)
 	{
 		var model = _configuration["Ollama:Model"] ?? "llama3.2:3b";
+		var keepAlive = _configuration["Ollama:KeepAlive"] ?? "30m";
+		var maxResponseTokens = int.TryParse(_configuration["Ollama:MaxResponseTokens"], out var parsedMaxTokens)
+			? parsedMaxTokens
+			: 96;
 
-		var request = new OllamaGenerateRequest(
+		var request = new OllamaChatRequest(
 			model,
-			prompt,
-			Stream: false);
+			[
+				new OllamaChatRequestMessage("user", prompt)
+			],
+			Stream: false,
+			keepAlive,
+			new OllamaChatRequestOptions(maxResponseTokens));
 
 		using var response = await _httpClient.PostAsJsonAsync(
-			"api/generate",
+			"api/chat",
 			request,
 			cancellationToken);
 
@@ -54,22 +62,73 @@ public sealed class OllamaProvider : ILLMProvider
 				$"Ollama request failed with status {(int)response.StatusCode}: {errorContent}");
 		}
 
-		var ollamaResponse = await response.Content.ReadFromJsonAsync<OllamaGenerateResponse>(
+		var ollamaResponse = await response.Content.ReadFromJsonAsync<OllamaChatResponse>(
 			cancellationToken: cancellationToken);
 
-		if (string.IsNullOrWhiteSpace(ollamaResponse?.Response))
+		var responseText = ollamaResponse?.Message?.Content ?? ollamaResponse?.Response;
+
+		if (string.IsNullOrWhiteSpace(responseText))
 		{
 			throw new InvalidOperationException("Ollama returned an empty response.");
 		}
 
-		return new AssistantResponse(ollamaResponse.Response.Trim());
+		return new AssistantResponse(responseText.Trim());
 	}
 
-	private sealed record OllamaGenerateRequest(
+	private sealed record OllamaChatRequest(
 		[property: JsonPropertyName("model")] string Model,
-		[property: JsonPropertyName("prompt")] string Prompt,
-		[property: JsonPropertyName("stream")] bool Stream);
+		[property: JsonPropertyName("messages")] IReadOnlyList<OllamaChatRequestMessage> Messages,
+		[property: JsonPropertyName("stream")] bool Stream,
+		[property: JsonPropertyName("keep_alive")] string KeepAlive = "30m",
+		[property: JsonPropertyName("options")] OllamaChatRequestOptions? Options = null);
 
-	private sealed record OllamaGenerateResponse(
-		[property: JsonPropertyName("response")] string Response);
+	private sealed record OllamaChatRequestOptions(
+		[property: JsonPropertyName("num_predict")] int NumPredict);
+
+	private sealed record OllamaChatRequestMessage(
+		[property: JsonPropertyName("role")] string Role,
+		[property: JsonPropertyName("content")] string Content);
+
+	private sealed record OllamaChatMessage(
+		[property: JsonPropertyName("role")]
+		string? Role,
+
+		[property: JsonPropertyName("content")]
+		string? Content);
+	private sealed record OllamaChatResponse(
+		[property: JsonPropertyName("message")]
+		OllamaChatMessage? Message,
+
+		[property: JsonPropertyName("response")]
+		string? Response,
+
+		[property: JsonPropertyName("model")]
+		string? Model,
+
+		[property: JsonPropertyName("created_at")]
+		DateTimeOffset? CreatedAt,
+
+		[property: JsonPropertyName("done")]
+		bool Done,
+
+		[property: JsonPropertyName("done_reason")]
+		string? DoneReason,
+
+		[property: JsonPropertyName("total_duration")]
+		long TotalDuration,
+
+		[property: JsonPropertyName("load_duration")]
+		long LoadDuration,
+
+		[property: JsonPropertyName("prompt_eval_count")]
+		int PromptEvalCount,
+
+		[property: JsonPropertyName("prompt_eval_duration")]
+		long PromptEvalDuration,
+
+		[property: JsonPropertyName("eval_count")]
+		int EvalCount,
+
+		[property: JsonPropertyName("eval_duration")]
+		long EvalDuration);
 }
