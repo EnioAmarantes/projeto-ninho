@@ -9,12 +9,14 @@ namespace ProjetoNinho.Infrastructure.LLM;
 public sealed class FakeLLMProvider : ILLMProvider
 {
     /// <summary>
-    /// Returns a fixed response regardless of prompt content.
+    /// Returns a fixed response regardless of messages content.
     /// </summary>
-    /// <param name="prompt">Prompt text.</param>
+    /// <param name="messages">Conversation messages.</param>
     /// <param name="cancellationToken">Cancellation token for async flow.</param>
     /// <returns>A fixed assistant response.</returns>
-    public Task<AssistantResponse> CompleteAsync(string prompt, CancellationToken cancellationToken = default)
+    public Task<AssistantResponse> ChatAsync(
+        IReadOnlyCollection<Message> messages,
+        CancellationToken cancellationToken = default)
     {
         return Task.FromResult(
             new AssistantResponse(

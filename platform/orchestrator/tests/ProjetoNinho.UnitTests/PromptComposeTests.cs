@@ -8,17 +8,19 @@ namespace ProjetoNinho.UnitTests;
 public sealed class PromptComposeTests
 {
     /// <summary>
-    /// Ensures the prompt contains system text and the provided user message.
+    /// Ensures composed messages include system and user entries.
     /// </summary>
     [Fact]
-    public void Build_ShouldIncludeSystemInstructionAndUserMessage()
+    public void Build_ShouldComposeSystemAndUserMessages()
     {
         var sut = new PromptCompose();
 
-        var prompt = sut.Build("Oi, Jarvis!");
+        var messages = sut.Build("Oi, Jarvis!");
 
-        Assert.Contains("Você é Jarvis", prompt);
-        Assert.Contains("Usuário:", prompt);
-        Assert.Contains("Oi, Jarvis!", prompt);
+        Assert.Equal(2, messages.Count);
+        Assert.Equal(ConversationRole.System, messages[0].Role);
+        Assert.Contains("Você é Jarvis", messages[0].Content);
+        Assert.Equal(ConversationRole.User, messages[1].Role);
+        Assert.Equal("Oi, Jarvis!", messages[1].Content);
     }
 }

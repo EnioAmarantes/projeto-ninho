@@ -23,7 +23,7 @@ public static class ConversationEndpoints
                 request.Message,
                 cancellationToken);
 
-            return Results.Ok(new ConversationResponse(result.Message));
+            return Results.Ok(new ConversationResponse(result.Content));
         });
 
         return app;

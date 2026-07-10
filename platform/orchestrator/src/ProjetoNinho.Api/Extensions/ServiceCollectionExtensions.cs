@@ -1,7 +1,7 @@
 using ProjetoNinho.Application.Conversation;
 using ProjetoNinho.Application.LLM;
 using ProjetoNinho.Domain.Conversation;
-using ProjetoNinho.Infrastructure.LLM;
+using ProjetoNinho.Infrastructure.LLM.Ollama;
 
 /// <summary>
 /// Dependency injection registrations for Projeto Ninho API.
@@ -18,16 +18,21 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<OllamaOptions>(
+            configuration.GetSection(OllamaOptions.SectionName));
+
         services.AddScoped<PromptCompose>();
         services.AddScoped<ConversationOrchestrator>();
+
+        var ollamaOptions = configuration
+            .GetSection(OllamaOptions.SectionName)
+            .Get<OllamaOptions>() ?? new OllamaOptions();
+
         services
             .AddHttpClient<ILLMProvider, OllamaProvider>((_, client) =>
             {
-                var baseUrl = configuration["Ollama:BaseUrl"] ?? "http://localhost:11434/";
-                var timeoutSeconds = configuration.GetValue<int?>("Ollama:TimeoutSeconds") ?? 120;
-
-                client.BaseAddress = new Uri(baseUrl);
-                client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+                client.BaseAddress = new Uri(ollamaOptions.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(ollamaOptions.TimeoutSeconds);
             });
 
         return services;

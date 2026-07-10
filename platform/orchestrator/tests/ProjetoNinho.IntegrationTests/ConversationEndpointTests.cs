@@ -47,8 +47,8 @@ public sealed class ConversationEndpointTests
 
     private sealed class TestLlmProvider : ILLMProvider
     {
-        public Task<AssistantResponse> CompleteAsync(
-            string prompt,
+        public Task<AssistantResponse> ChatAsync(
+            IReadOnlyCollection<Message> messages,
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(new AssistantResponse("resposta de integracao"));

@@ -10,10 +10,10 @@ namespace ProjetoNinho.UnitTests;
 public sealed class ConversationOrchestratorTests
 {
     /// <summary>
-    /// Ensures the orchestrator forwards the composed prompt and returns provider output.
+    /// Ensures the orchestrator forwards composed messages and returns provider output.
     /// </summary>
     [Fact]
-    public async Task HandleAsync_ShouldReturnProviderResponse_AndForwardComposedPrompt()
+    public async Task HandleAsync_ShouldReturnProviderResponse_AndForwardComposedMessages()
     {
         var promptCompose = new PromptCompose();
         var spyProvider = new SpyLlmProvider("resposta de teste");
@@ -21,21 +21,31 @@ public sealed class ConversationOrchestratorTests
 
         var result = await sut.HandleAsync("mensagem do usuario");
 
-        Assert.Equal("resposta de teste", result.Message);
-        Assert.NotNull(spyProvider.ReceivedPrompt);
-        Assert.Contains("mensagem do usuario", spyProvider.ReceivedPrompt);
-        Assert.Contains("Você é Jarvis", spyProvider.ReceivedPrompt);
+        Assert.Equal("resposta de teste", result.Content);
+        Assert.NotNull(spyProvider.ReceivedMessages);
+        Assert.Collection(
+            spyProvider.ReceivedMessages!,
+            system =>
+            {
+                Assert.Equal(ConversationRole.System, system.Role);
+                Assert.Contains("Você é Jarvis", system.Content);
+            },
+            user =>
+            {
+                Assert.Equal(ConversationRole.User, user.Role);
+                Assert.Equal("mensagem do usuario", user.Content);
+            });
     }
 
     private sealed class SpyLlmProvider(string responseMessage) : ILLMProvider
     {
-        public string? ReceivedPrompt { get; private set; }
+        public IReadOnlyCollection<Message>? ReceivedMessages { get; private set; }
 
-        public Task<AssistantResponse> CompleteAsync(
-            string prompt,
+        public Task<AssistantResponse> ChatAsync(
+            IReadOnlyCollection<Message> messages,
             CancellationToken cancellationToken = default)
         {
-            ReceivedPrompt = prompt;
+            ReceivedMessages = messages;
             return Task.FromResult(new AssistantResponse(responseMessage));
         }
     }

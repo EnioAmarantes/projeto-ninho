@@ -4,23 +4,23 @@ using ProjetoNinho.Domain.Conversation;
 namespace ProjetoNinho.Application.Conversation;
 
 /// <summary>
-/// Coordinates prompt composition and LLM completion for conversation requests.
+/// Coordinates message composition and LLM chat requests for conversation requests.
 /// </summary>
 public sealed class ConversationOrchestrator
 {
-    private readonly PromptCompose _promptBuilder;
+    private readonly PromptCompose _messageComposer;
     private readonly ILLMProvider _llmProvider;
     
     /// <summary>
     /// Initializes a new orchestrator instance.
     /// </summary>
-    /// <param name="promptBuilder">Prompt composition service.</param>
+    /// <param name="promptBuilder">Message composition service.</param>
     /// <param name="llmProvider">LLM provider implementation.</param>
     public ConversationOrchestrator(
         PromptCompose promptBuilder, 
         ILLMProvider llmProvider)
     {
-        _promptBuilder = promptBuilder;
+        _messageComposer = promptBuilder;
         _llmProvider = llmProvider;
     }
 
@@ -34,10 +34,10 @@ public sealed class ConversationOrchestrator
         string message,
         CancellationToken cancellationToken = default)
     {
-        var prompt = _promptBuilder.Build(message);
+        var messages = _messageComposer.Build(message);
 
-        return await _llmProvider.CompleteAsync(
-            prompt, 
+        return await _llmProvider.ChatAsync(
+            messages,
             cancellationToken
         );
     }
