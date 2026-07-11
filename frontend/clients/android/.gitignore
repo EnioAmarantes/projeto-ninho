@@ -1,4 +1,4 @@
-*.iml
+# Project-wide Gradle settings
 .gradle
 /local.properties
 /.idea/caches
@@ -13,3 +13,42 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Android Studio / IntelliJ IDEA
+*.iml
+*.iws
+*.ipr
+/out
+.idea/
+
+# Keystore files
+*.jks
+*.keystore
+*.pk8
+*.pem
+
+# Google Services
+google-services.json
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics.generated.properties
+crashlytics-build.properties
+crashlytics-build.properties.new
+
+# Android NDK
+obj/
+
+# Kotlin
+*.kotlin_module
+
+# Gradle
+.gradle/
+build/
+
+# Log files
+*.log
+
+# Generated files
+/app/build/
+/build/

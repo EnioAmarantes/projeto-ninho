@@ -1,1 +1,7 @@
 /build
+*.iml
+*.iws
+*.ipr
+/out
+.idea/
+/local.properties
