@@ -1,0 +1,28 @@
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.jks
+id_rsa
+id_ed25519
+
+# Local credentials/configs
+secrets.json
+secrets.yaml
+secrets.yml
+credentials.json
+credentials.yaml
+credentials.yml
+
+# Android local SDK path (machine-specific)
+**/local.properties
+
+# Common editor/system local files
+.DS_Store
+.vscode/settings.json
