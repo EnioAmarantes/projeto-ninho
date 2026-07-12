@@ -34,6 +34,8 @@ public sealed class ConversationOrchestrator
         string message,
         CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(message);
+
         var messages = _messageComposer.Build(message);
 
         return await _llmProvider.ChatAsync(

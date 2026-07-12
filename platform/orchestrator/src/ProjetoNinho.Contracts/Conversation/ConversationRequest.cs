@@ -1,4 +1,4 @@
-namespace ProjetoNinho.Domain.Conversation;
+namespace ProjetoNinho.Contracts.Conversation;
 
 /// <summary>
 /// Request payload for a conversation completion.

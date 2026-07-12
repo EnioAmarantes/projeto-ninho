@@ -37,6 +37,20 @@ public sealed class ConversationOrchestratorTests
             });
     }
 
+    /// <summary>
+    /// Ensures blank messages are rejected before invoking the provider.
+    /// </summary>
+    [Fact]
+    public async Task HandleAsync_ShouldRejectBlankMessages()
+    {
+        var sut = new ConversationOrchestrator(
+            new PromptCompose(),
+            new SpyLlmProvider("não deve ser chamado"));
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => sut.HandleAsync("   "));
+    }
+
     private sealed class SpyLlmProvider(string responseMessage) : ILLMProvider
     {
         public IReadOnlyCollection<Message>? ReceivedMessages { get; private set; }

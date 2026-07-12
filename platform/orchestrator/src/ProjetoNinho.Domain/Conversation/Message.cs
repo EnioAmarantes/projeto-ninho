@@ -32,6 +32,8 @@ public sealed class Message
     /// <param name="content">Message content.</param>
     public Message(ConversationRole role, string content)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(content);
+
         Id = Guid.NewGuid();
         Role = role;
         Content = content;

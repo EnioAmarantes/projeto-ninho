@@ -1,6 +1,5 @@
 using ProjetoNinho.Application.Conversation;
 using ProjetoNinho.Application.LLM;
-using ProjetoNinho.Domain.Conversation;
 using ProjetoNinho.Infrastructure.LLM.Ollama;
 
 /// <summary>
@@ -18,19 +17,27 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<OllamaOptions>(
-            configuration.GetSection(OllamaOptions.SectionName));
+        services.AddProblemDetails();
+
+        services.AddLLMProvider(configuration);
 
         services.AddScoped<PromptCompose>();
         services.AddScoped<ConversationOrchestrator>();
 
-        var ollamaOptions = configuration
-            .GetSection(OllamaOptions.SectionName)
-            .Get<OllamaOptions>() ?? new OllamaOptions();
+        return services;
+    }
 
+    private static IServiceCollection AddLLMProvider(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<OllamaOptions>(
+            configuration.GetSection(OllamaOptions.SectionName));
         services
-            .AddHttpClient<ILLMProvider, OllamaProvider>((_, client) =>
+            .AddHttpClient<ILLMProvider, OllamaProvider>((serviceProvider, client) =>
             {
+                var ollamaOptions = serviceProvider
+                    .GetRequiredService<Microsoft.Extensions.Options.IOptions<OllamaOptions>>()
+                    .Value;
+
                 client.BaseAddress = new Uri(ollamaOptions.BaseUrl);
                 client.Timeout = TimeSpan.FromSeconds(ollamaOptions.TimeoutSeconds);
             });

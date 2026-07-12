@@ -1,4 +1,5 @@
-﻿using ProjetoNinho.Domain.Conversation;
+﻿using ProjetoNinho.Application.Conversation;
+using ProjetoNinho.Domain.Conversation;
 
 namespace ProjetoNinho.UnitTests;
 

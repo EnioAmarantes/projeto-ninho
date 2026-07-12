@@ -5,7 +5,7 @@ namespace ProjetoNinho.UnitTests;
 /// <summary>
 /// Unit tests for conversation message accumulation.
 /// </summary>
-public sealed class CConversationTests
+public sealed class ConversationTests
 {
     /// <summary>
     /// Ensures user and assistant messages are appended with expected role and order.
@@ -13,7 +13,7 @@ public sealed class CConversationTests
     [Fact]
     public void AddMethods_ShouldAppendMessagesWithExpectedRolesAndOrder()
     {
-        var conversation = new CConversation();
+        var conversation = new Conversation();
 
         conversation.AddUserMessage("Oi");
         conversation.AddAssistantMessage("Ola, em que posso ajudar?");

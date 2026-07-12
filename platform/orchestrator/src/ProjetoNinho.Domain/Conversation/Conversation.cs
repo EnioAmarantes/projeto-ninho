@@ -3,7 +3,7 @@ namespace ProjetoNinho.Domain.Conversation;
 /// <summary>
 /// Stores messages exchanged in a conversation.
 /// </summary>
-public class CConversation
+public sealed class Conversation
 {
     private readonly List<Message> _messages = [];
 

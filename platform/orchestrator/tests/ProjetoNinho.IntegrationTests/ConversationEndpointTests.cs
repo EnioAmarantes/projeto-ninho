@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using ProjetoNinho.Application.LLM;
+using ProjetoNinho.Contracts.Conversation;
 using ProjetoNinho.Domain.Conversation;
 
 namespace ProjetoNinho.IntegrationTests;
@@ -32,6 +33,22 @@ public sealed class ConversationEndpointTests
 
         Assert.NotNull(body);
         Assert.Equal("resposta de integracao", body.Message);
+    }
+
+    /// <summary>
+    /// Ensures the endpoint rejects blank messages with a client error.
+    /// </summary>
+    [Fact]
+    public async Task PostConversation_ShouldRejectBlankMessage()
+    {
+        await using var factory = new TestApiFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.PostAsJsonAsync(
+            "/api/conversation",
+            new ConversationRequest("   "));
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     private sealed class TestApiFactory : WebApplicationFactory<Program>

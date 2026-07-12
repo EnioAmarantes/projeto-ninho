@@ -1,4 +1,6 @@
-namespace ProjetoNinho.Domain.Conversation;
+using ProjetoNinho.Domain.Conversation;
+
+namespace ProjetoNinho.Application.Conversation;
 
 /// <summary>
 /// Builds structured messages sent to the LLM provider.

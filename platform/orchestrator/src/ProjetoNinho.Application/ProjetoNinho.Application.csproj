@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProjetoNinho.Domain\ProjetoNinho.Domain.csproj" />
-    <ProjectReference Include="..\ProjetoNinho.Contracts\ProjetoNinho.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

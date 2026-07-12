@@ -1,5 +1,5 @@
 using ProjetoNinho.Application.Conversation;
-using ProjetoNinho.Domain.Conversation;
+using ProjetoNinho.Contracts.Conversation;
 
 /// <summary>
 /// Maps conversation-related API endpoints.
@@ -19,8 +19,16 @@ public static class ConversationEndpoints
             ConversationOrchestrator orchestrator,
             CancellationToken cancellationToken) =>
         {
+            if (string.IsNullOrWhiteSpace(request.Message))
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    [nameof(request.Message)] = ["A mensagem é obrigatória."]
+                });
+            }
+
             var result = await orchestrator.HandleAsync(
-                request.Message,
+                request.Message.Trim(),
                 cancellationToken);
 
             return Results.Ok(new ConversationResponse(result.Content));
