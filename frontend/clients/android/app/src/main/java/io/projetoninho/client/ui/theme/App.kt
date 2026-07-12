@@ -15,20 +15,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.projetoninho.client.conversation.api.ConversationApi
 import io.projetoninho.client.conversation.data.ConversationRepositoryImpl
 import io.projetoninho.client.conversation.presentation.ConversationViewModel
+import io.projetoninho.client.core.audio.TextToSpeechManager
 import io.projetoninho.client.core.network.ProjetoNinhoClient
 
 @Composable
 fun App() {
+    val context = LocalContext.current
     val repository = remember {
         ConversationRepositoryImpl(ConversationApi(ProjetoNinhoClient.http))
     }
+    val ttsManager = remember {
+        TextToSpeechManager(context)
+    }
     val viewModel: ConversationViewModel = viewModel(
-        factory = ConversationViewModel.factory(repository)
+        factory = ConversationViewModel.factory(repository, ttsManager)
     )
     val state = viewModel.uiState
 

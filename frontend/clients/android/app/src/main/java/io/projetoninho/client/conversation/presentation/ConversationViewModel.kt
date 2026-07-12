@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.projetoninho.client.conversation.data.ConversationRepository
+import io.projetoninho.client.core.audio.TextToSpeechManager
 import kotlinx.coroutines.launch
 
 class ConversationViewModel(
-    private val repository: ConversationRepository
+    private val repository: ConversationRepository,
+    private val ttsManager: TextToSpeechManager? = null
 ) : ViewModel() {
 
     var uiState by mutableStateOf(ConversationUiState())
@@ -29,6 +31,7 @@ class ConversationViewModel(
             try {
                 val response = repository.send(message)
                 uiState = uiState.copy(responseMessage = response, inputMessage = "")
+                ttsManager?.speak(response)
             } catch (_: Exception) {
                 uiState = uiState.copy(
                     errorMessage = "Não foi possível enviar a mensagem. Tente novamente."
@@ -39,13 +42,21 @@ class ConversationViewModel(
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        ttsManager?.shutdown()
+    }
+
     companion object {
-        fun factory(repository: ConversationRepository): ViewModelProvider.Factory =
+        fun factory(
+            repository: ConversationRepository,
+            ttsManager: TextToSpeechManager
+        ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     check(modelClass.isAssignableFrom(ConversationViewModel::class.java))
-                    return ConversationViewModel(repository) as T
+                    return ConversationViewModel(repository, ttsManager) as T
                 }
             }
     }
