@@ -12,16 +12,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.projetoninho.client.conversation.api.ConversationApi
+import io.projetoninho.client.conversation.data.ConversationRepositoryImpl
 import io.projetoninho.client.conversation.presentation.ConversationViewModel
+import io.projetoninho.client.core.network.ProjetoNinhoClient
 
 @Composable
-fun App(
-    viewModel: ConversationViewModel = viewModel()
-) {
+fun App() {
+    val repository = remember {
+        ConversationRepositoryImpl(ConversationApi(ProjetoNinhoClient.http))
+    }
+    val viewModel: ConversationViewModel = viewModel(
+        factory = ConversationViewModel.factory(repository)
+    )
+    val state = viewModel.uiState
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,11 +46,11 @@ fun App(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = viewModel.inputMessage,
+            value = state.inputMessage,
             onValueChange = viewModel::onInputMessageChange,
             label = { Text("Digite sua mensagem") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !viewModel.isLoading
+            enabled = !state.isLoading
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -48,9 +58,9 @@ fun App(
         Button(
             onClick = viewModel::sendMessage,
             modifier = Modifier.fillMaxWidth(),
-            enabled = !viewModel.isLoading && viewModel.inputMessage.isNotBlank()
+            enabled = !state.isLoading && state.inputMessage.isNotBlank()
         ) {
-            if (viewModel.isLoading) {
+            if (state.isLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.padding(end = 8.dp)
@@ -61,13 +71,21 @@ fun App(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (viewModel.responseMessage.isNotEmpty()) {
+        state.errorMessage?.let { errorMessage ->
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        if (state.responseMessage.isNotEmpty()) {
             Text(
                 text = "Resposta:",
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = viewModel.responseMessage,
+                text = state.responseMessage,
                 style = MaterialTheme.typography.bodyLarge
             )
         }

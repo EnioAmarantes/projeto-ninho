@@ -4,43 +4,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import io.projetoninho.client.conversation.api.ConversationApi
 import io.projetoninho.client.conversation.data.ConversationRepository
-import io.projetoninho.client.conversation.data.ConversationRepositoryImpl
 import kotlinx.coroutines.launch
 
 class ConversationViewModel(
-    private val repository: ConversationRepository = ConversationRepositoryImpl(ConversationApi())
+    private val repository: ConversationRepository
 ) : ViewModel() {
 
-    var inputMessage by mutableStateOf("")
-        private set
-
-    var responseMessage by mutableStateOf("")
-        private set
-
-    var isLoading by mutableStateOf(false)
+    var uiState by mutableStateOf(ConversationUiState())
         private set
 
     fun onInputMessageChange(newMessage: String) {
-        inputMessage = newMessage
+        uiState = uiState.copy(inputMessage = newMessage, errorMessage = null)
     }
 
     fun sendMessage() {
-        if (inputMessage.isBlank()) return
+        val message = uiState.inputMessage.trim()
+        if (message.isEmpty()) return
 
         viewModelScope.launch {
-            isLoading = true
+            uiState = uiState.copy(isLoading = true, errorMessage = null)
             try {
-                val response = repository.send(inputMessage)
-                responseMessage = response
-                inputMessage = ""
-            } catch (e: Exception) {
-                responseMessage = "Erro: ${e.message}"
+                val response = repository.send(message)
+                uiState = uiState.copy(responseMessage = response, inputMessage = "")
+            } catch (_: Exception) {
+                uiState = uiState.copy(
+                    errorMessage = "Não foi possível enviar a mensagem. Tente novamente."
+                )
             } finally {
-                isLoading = false
+                uiState = uiState.copy(isLoading = false)
             }
         }
+    }
+
+    companion object {
+        fun factory(repository: ConversationRepository): ViewModelProvider.Factory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    check(modelClass.isAssignableFrom(ConversationViewModel::class.java))
+                    return ConversationViewModel(repository) as T
+                }
+            }
     }
 }

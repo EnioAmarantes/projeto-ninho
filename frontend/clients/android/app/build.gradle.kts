@@ -17,15 +17,24 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField(
-            "String",
-            "API_BASE_URL",
-            "\"http://192.168.0.7:5011/api/\""
-        )
+        manifestPlaceholders["usesCleartextTraffic"] = "false"
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"http://192.168.0.7:5011/api/\""
+            )
+            manifestPlaceholders["usesCleartextTraffic"] = "true"
+        }
         release {
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                "\"https://api.projetoninho.local/api/\""
+            )
             optimization {
                 enable = false
             }
