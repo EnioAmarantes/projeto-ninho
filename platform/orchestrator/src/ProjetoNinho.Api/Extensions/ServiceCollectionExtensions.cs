@@ -1,3 +1,4 @@
+using ProjetoNinho.Application.AI;
 using ProjetoNinho.Application.Conversation;
 using ProjetoNinho.Application.LLM;
 using ProjetoNinho.Infrastructure.LLM.Ollama;
@@ -20,6 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddProblemDetails();
 
         services.AddLLMProvider(configuration);
+
+        services.AddScoped<IPromptPackLoader, PromptPackLoader>();
 
         services.AddScoped<PromptCompose>();
         services.AddScoped<ConversationOrchestrator>();

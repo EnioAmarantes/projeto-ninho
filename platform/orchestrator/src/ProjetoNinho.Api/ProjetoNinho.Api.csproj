@@ -17,4 +17,11 @@
     <ProjectReference Include="..\ProjetoNinho.Infrastructure\ProjetoNinho.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\ProjetoNinho.Application\PromptPacks\**\*.md"
+             Link="PromptPacks\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
