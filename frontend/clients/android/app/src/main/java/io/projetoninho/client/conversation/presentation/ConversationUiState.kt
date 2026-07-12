@@ -4,5 +4,7 @@ data class ConversationUiState(
     val inputMessage: String = "",
     val responseMessage: String = "",
     val errorMessage: String? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isSpeaking: Boolean = false,
+    val isListening: Boolean = false
 )

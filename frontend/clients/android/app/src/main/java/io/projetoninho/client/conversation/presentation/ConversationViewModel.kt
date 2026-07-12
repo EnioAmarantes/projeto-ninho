@@ -18,6 +18,23 @@ class ConversationViewModel(
     var uiState by mutableStateOf(ConversationUiState())
         private set
 
+    init {
+        ttsManager?.onStartSpeaking = { setSpeakingState(true) }
+        ttsManager?.onFinishedSpeaking = { setSpeakingState(false) }
+    }
+
+    fun setSpeakingState(isSpeaking: Boolean) {
+        viewModelScope.launch {
+            uiState = uiState.copy(isSpeaking = isSpeaking)
+        }
+    }
+
+    fun setListeningState(isListening: Boolean) {
+        viewModelScope.launch {
+            uiState = uiState.copy(isListening = isListening)
+        }
+    }
+
     fun onInputMessageChange(newMessage: String) {
         uiState = uiState.copy(inputMessage = newMessage, errorMessage = null)
     }
@@ -26,8 +43,9 @@ class ConversationViewModel(
         val message = uiState.inputMessage.trim()
         if (message.isEmpty()) return
 
+        uiState = uiState.copy(isLoading = true, errorMessage = null)
+
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, errorMessage = null)
             try {
                 val response = repository.send(message)
                 uiState = uiState.copy(responseMessage = response, inputMessage = "")
