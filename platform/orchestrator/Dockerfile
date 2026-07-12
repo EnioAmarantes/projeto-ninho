@@ -30,6 +30,6 @@ EXPOSE 8080
 
 COPY --from=build /app/publish .
 
-USER $APP_UID
+HEALTHCHECK CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["dotnet", "ProjetoNinho.Api.dll"]
