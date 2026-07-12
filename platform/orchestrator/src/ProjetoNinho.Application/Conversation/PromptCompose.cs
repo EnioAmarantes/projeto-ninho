@@ -10,6 +10,10 @@ public sealed class PromptCompose
 {
     private readonly IPromptPackLoader _promptPackLoader;
 
+    /// <summary>
+    /// Creates a prompt composer using the prompt pack loader.
+    /// </summary>
+    /// <param name="promptPackLoader">Prompt pack loader implementation.</param>
     public PromptCompose(IPromptPackLoader promptPackLoader)
     {
         _promptPackLoader = promptPackLoader;
