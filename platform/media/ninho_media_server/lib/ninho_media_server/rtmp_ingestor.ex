@@ -14,7 +14,12 @@ defmodule NinhoMediaServer.RtmpIngestor do
   @impl true
   def init(state) do
     send(self(), :start_ffmpeg)
-    {:ok, Map.put(state, :port, nil)}
+    {:ok, Map.merge(state, %{port: nil, restart_timer: nil, shutting_down: false})}
+  end
+
+  @impl true
+  def handle_info(:start_ffmpeg, %{shutting_down: true} = state) do
+    {:noreply, state}
   end
 
   @impl true
@@ -30,12 +35,11 @@ defmodule NinhoMediaServer.RtmpIngestor do
         args: args
       ])
 
-    {:noreply, %{state | port: port}}
+    {:noreply, %{state | port: port, restart_timer: nil}}
   rescue
     error ->
       Logger.error("Failed to start FFmpeg: #{Exception.message(error)}")
-      Process.send_after(self(), :start_ffmpeg, @restart_delay_ms)
-      {:noreply, %{state | port: nil}}
+      {:noreply, schedule_restart(%{state | port: nil})}
   end
 
   @impl true
@@ -45,11 +49,43 @@ defmodule NinhoMediaServer.RtmpIngestor do
   end
 
   @impl true
-  def handle_info({port, {:exit_status, status}}, %{port: port} = state) do
-    Logger.warning("FFmpeg exited with status #{status}. Restarting in #{@restart_delay_ms}ms")
-    Process.send_after(self(), :start_ffmpeg, @restart_delay_ms)
+  def handle_info({port, {:exit_status, status}}, %{port: port, shutting_down: true} = state) do
+    Logger.info("FFmpeg exited with status #{status} during shutdown")
     {:noreply, %{state | port: nil}}
   end
+
+  @impl true
+  def handle_info({port, {:exit_status, status}}, %{port: port} = state) do
+    Logger.warning("FFmpeg exited with status #{status}. Restarting in #{@restart_delay_ms}ms")
+    {:noreply, schedule_restart(%{state | port: nil})}
+  end
+
+  @impl true
+  def terminate(_reason, state) do
+    state = %{state | shutting_down: true}
+    cancel_restart_timer(state.restart_timer)
+
+    case state.port do
+      nil ->
+        :ok
+
+      port ->
+        Logger.info("Stopping FFmpeg RTMP listener")
+        Port.close(port)
+        :ok
+    end
+  end
+
+  defp schedule_restart(%{shutting_down: true} = state), do: %{state | restart_timer: nil}
+
+  defp schedule_restart(state) do
+    cancel_restart_timer(state.restart_timer)
+    timer = Process.send_after(self(), :start_ffmpeg, @restart_delay_ms)
+    %{state | restart_timer: timer}
+  end
+
+  defp cancel_restart_timer(nil), do: :ok
+  defp cancel_restart_timer(timer_ref), do: Process.cancel_timer(timer_ref)
 
   defp ffmpeg_args do
     rtmp_url = Application.get_env(:ninho_media_server, :rtmp_listen_url)
