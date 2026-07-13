@@ -40,5 +40,26 @@ services:
       Ollama__BaseUrl: http://ollama:11434
       Ollama__Model: jarvis:latest
 
+  media:
+
+    build:
+      context: ./platform/media/ninho_media_server
+
+    container_name: projetoninho-media
+
+    restart: unless-stopped
+
+    ports:
+      - "9090:9090"
+      - "1935:1935"
+
+    environment:
+      MIX_ENV: prod
+
+    volumes:
+      - ./platform/media/ninho_media_server/priv/models:/app/priv/models
+      - ./platform/media/ninho_media_server/priv/frames:/app/priv/frames
+      - ./platform/media/ninho_media_server/priv/static/hls:/app/priv/static/hls
+
 volumes:
   ollama-data:
