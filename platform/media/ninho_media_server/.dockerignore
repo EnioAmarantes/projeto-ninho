@@ -1,0 +1,33 @@
+# VCS and editor artifacts
+.git
+.gitignore
+.vscode
+.idea
+
+# Build and dependency artifacts
+_build
+deps
+cover
+doc
+tmp
+
+# Runtime outputs and large local assets
+priv/frames/input/*
+priv/frames/annotated/*
+priv/static/hls/*
+priv/models/*.onnx
+videos
+
+# Keep runtime directory structure placeholders
+!priv/frames/input/.gitkeep
+!priv/frames/annotated/.gitkeep
+!priv/static/hls/.gitkeep
+!priv/models/.gitkeep
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Logs and crash dumps
+*.log
+erl_crash.dump
