@@ -27,6 +27,11 @@ android {
                 "API_BASE_URL",
                 "\"http://192.168.0.7:5011/api/\""
             )
+            buildConfigField(
+                "String",
+                "RTMP_URL",
+                "\"rtmp://192.168.0.7:1935/live/camera\""
+            )
             manifestPlaceholders["usesCleartextTraffic"] = "true"
         }
         release {
@@ -34,6 +39,11 @@ android {
                 "String",
                 "API_BASE_URL",
                 "\"https://api.projetoninho.local/api/\""
+            )
+            buildConfigField(
+                "String",
+                "RTMP_URL",
+                "\"rtmp://api.projetoninho.local:1935/live/camera\""
             )
             optimization {
                 enable = false
