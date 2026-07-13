@@ -79,6 +79,15 @@ dependencies {
     implementation(libs.ktor.client.logging)
 
     implementation(libs.coroutines.android)
+
+    // CameraX
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // RTMP
+    implementation(libs.rootencoder)
 }
 
 kotlin {

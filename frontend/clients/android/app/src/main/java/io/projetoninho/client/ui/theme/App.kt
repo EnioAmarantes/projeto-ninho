@@ -1,6 +1,7 @@
 package io.projetoninho.client.ui.theme
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,12 +11,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.pedro.library.view.OpenGlView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.projetoninho.client.conversation.api.ConversationApi
@@ -24,6 +29,7 @@ import io.projetoninho.client.conversation.presentation.ConversationViewModel
 import io.projetoninho.client.core.audio.SpeechToTextManager
 import io.projetoninho.client.core.audio.TextToSpeechManager
 import io.projetoninho.client.core.network.ProjetoNinhoClient
+import io.projetoninho.client.core.video.CameraStreamManager
 
 @Composable
 fun VoiceWaveform() {
@@ -61,21 +67,7 @@ fun VoiceWaveform() {
 @Composable
 fun App() {
     val context = LocalContext.current
-    var hasMicPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.RECORD_AUDIO
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasMicPermission = isGranted
-    }
-
+    
     val repository = remember {
         ConversationRepositoryImpl(ConversationApi(ProjetoNinhoClient.http))
     }
@@ -86,6 +78,45 @@ fun App() {
             remember { TextToSpeechManager(context) }
         )
     )
+
+    var hasMicPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        hasMicPermission = permissions[Manifest.permission.RECORD_AUDIO] ?: hasMicPermission
+        hasCameraPermission = permissions[Manifest.permission.CAMERA] ?: hasCameraPermission
+    }
+
+    var isStreaming by remember { mutableStateOf(false) }
+    
+    // Usamos um holder estável para o manager fora da composição do AndroidView
+    val streamManagerRef = remember { mutableStateOf<CameraStreamManager?>(null) }
+
+    // Efeito para sincronizar o estado isStreaming com a ação de parar o stream
+    LaunchedEffect(isStreaming) {
+        if (!isStreaming && streamManagerRef.value != null) {
+            streamManagerRef.value?.stopStream()
+            streamManagerRef.value?.stopPreview()
+            streamManagerRef.value = null
+        }
+    }
 
     val sttManager = remember {
         SpeechToTextManager(
@@ -101,15 +132,15 @@ fun App() {
             onSpeechReady = {
                 viewModel.setListeningState(true)
             },
-            onSpeechEnd = {
-                // Mantemos isListening até o onResult ou onError para bloquear o botão durante o processamento STT
-            }
+            onSpeechEnd = { }
         )
     }
 
     DisposableEffect(Unit) {
         onDispose {
             sttManager.destroy()
+            streamManagerRef.value?.stopStream()
+            streamManagerRef.value?.stopPreview()
         }
     }
 
@@ -121,12 +152,56 @@ fun App() {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(18.dp))
+
         Text(
             text = "Projeto Ninho",
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Preview da Câmera (só exibe se estiver streamando)
+        if (isStreaming) {
+            Box(
+                modifier = Modifier
+                    .size(width = 160.dp, height = 120.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium)
+                    .padding(4.dp)
+            ) {
+                if (hasCameraPermission) {
+                    AndroidView(
+                        factory = { ctx ->
+                            OpenGlView(ctx).apply {
+                                post {
+                                    if (streamManagerRef.value == null) {
+                                        val manager = CameraStreamManager(
+                                            openGlView = this,
+                                            onStreamSuccessCallback = { 
+                                                // Já está true aqui pelo clique do botão
+                                            },
+                                            onStreamFailedCallback = { error ->
+                                                isStreaming = false
+                                                viewModel.setErrorMessage("Erro no Stream: $error")
+                                            }
+                                        )
+                                        streamManagerRef.value = manager
+                                        manager.startPreview()
+                                        manager.startStream("rtmp://192.168.0.7:1935/live/camera")
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                        onRelease = {
+                            // O stop é tratado pelo LaunchedEffect
+                        }
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         OutlinedTextField(
             value = state.inputMessage,
@@ -135,6 +210,42 @@ fun App() {
             modifier = Modifier.fillMaxWidth(),
             enabled = !state.isLoading && !state.isListening && !state.isSpeaking
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Botão de Stream
+        Button(
+            onClick = {
+                if (hasCameraPermission && hasMicPermission) {
+                    isStreaming = !isStreaming
+                } else {
+                    permissionsLauncher.launch(
+                        arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                    )
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isStreaming) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+            ),
+            enabled = !state.isLoading && !state.isListening && !state.isSpeaking
+        ) {
+            Icon(
+                imageVector = if (isStreaming) Icons.Default.Stop else Icons.Default.Videocam,
+                contentDescription = null
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(if (isStreaming) "Encerrar Transmissão" else "Transmitir Câmera")
+        }
+
+        if (isStreaming) {
+            Text(
+                text = "Transmitindo para: rtmp://192.168.0.7:1935/live/camera",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -148,7 +259,7 @@ fun App() {
                     viewModel.setListeningState(true)
                     sttManager.startListening()
                 } else {
-                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    permissionsLauncher.launch(arrayOf(Manifest.permission.RECORD_AUDIO))
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -203,5 +314,21 @@ fun App() {
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        OutlinedButton(
+            onClick = {
+                (context as? Activity)?.finish()
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            )
+        ) {
+            Text("Sair")
+        }
+
+        Spacer(modifier = Modifier.height(22.dp))
     }
 }

@@ -39,6 +39,12 @@ class ConversationViewModel(
         uiState = uiState.copy(inputMessage = newMessage, errorMessage = null)
     }
 
+    fun setErrorMessage(message: String?) {
+        viewModelScope.launch {
+            uiState = uiState.copy(errorMessage = message)
+        }
+    }
+
     fun sendMessage() {
         val message = uiState.inputMessage.trim()
         if (message.isEmpty()) return
