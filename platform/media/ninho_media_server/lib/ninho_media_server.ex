@@ -1,5 +1,5 @@
 defmodule NinhoMediaServer do
   @moduledoc """
-  RTMP ingest + YOLO person detection + web streaming server.
+  RTMP ingest + web streaming server.
   """
 end

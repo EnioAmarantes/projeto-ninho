@@ -11,14 +11,12 @@ defmodule NinhoMediaServer.Application do
     port = Application.get_env(:ninho_media_server, :web_port, 8080)
     start_web? = Application.get_env(:ninho_media_server, :start_web, true)
     start_ingestor? = Application.get_env(:ninho_media_server, :start_ingestor, true)
-    start_annotator? = Application.get_env(:ninho_media_server, :start_annotator, true)
 
-    base_children = [NinhoMediaServer.FrameStore]
+    base_children = []
 
     children =
       base_children
       |> maybe_add_child(start_ingestor?, NinhoMediaServer.RtmpIngestor)
-      |> maybe_add_child(start_annotator?, NinhoMediaServer.YoloAnnotator)
       |> maybe_add_child(
         start_web?,
         {Plug.Cowboy,
@@ -28,7 +26,7 @@ defmodule NinhoMediaServer.Application do
     opts = [strategy: :one_for_one, name: NinhoMediaServer.Supervisor]
 
     Logger.info(
-      "Starting NinhoMediaServer with web=#{start_web?} rtmp=#{start_ingestor?} yolo=#{start_annotator?} on port #{port}"
+      "Starting NinhoMediaServer with web=#{start_web?} rtmp=#{start_ingestor?} on port #{port}"
     )
 
     Supervisor.start_link(children, opts)

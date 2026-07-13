@@ -90,8 +90,6 @@ defmodule NinhoMediaServer.RtmpIngestor do
   defp ffmpeg_args do
     rtmp_url = Application.get_env(:ninho_media_server, :rtmp_listen_url)
     hls_manifest = Application.get_env(:ninho_media_server, :hls_manifest_path)
-    frame_output_pattern = Application.get_env(:ninho_media_server, :frame_output_pattern)
-    frame_fps = Application.get_env(:ninho_media_server, :frame_sample_fps)
 
     [
       "-y",
@@ -99,10 +97,8 @@ defmodule NinhoMediaServer.RtmpIngestor do
       "1",
       "-i",
       rtmp_url,
-      "-filter_complex",
-      "[0:v]split=2[vhls][vframes];[vframes]fps=#{frame_fps}[vfps]",
       "-map",
-      "[vhls]",
+      "0:v:0",
       "-an",
       "-c:v",
       "libx264",
@@ -122,12 +118,7 @@ defmodule NinhoMediaServer.RtmpIngestor do
       "8",
       "-hls_flags",
       "delete_segments+append_list",
-      hls_manifest,
-      "-map",
-      "[vfps]",
-      "-q:v",
-      "2",
-      frame_output_pattern
+      hls_manifest
     ]
   end
 end

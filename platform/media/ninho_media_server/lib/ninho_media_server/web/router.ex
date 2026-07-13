@@ -17,10 +17,6 @@ defmodule NinhoMediaServer.Web.Router do
     send_resp(conn, 200, "ok")
   end
 
-  get "/stream.mjpeg" do
-    NinhoMediaServer.Web.MjpegStream.stream(conn)
-  end
-
   get "/" do
     send_resp(conn, 200, index_html())
   end
@@ -77,10 +73,6 @@ defmodule NinhoMediaServer.Web.Router do
           <section class=\"card\">
             <h2>Streaming recebido (HLS)</h2>
             <video id=\"hlsVideo\" controls autoplay muted playsinline></video>
-          </section>
-          <section class=\"card\">
-            <h2>Frame anotado (YOLO)</h2>
-            <img src=\"/stream.mjpeg\" alt=\"Stream anotado\" />
           </section>
         </div>
         <script>

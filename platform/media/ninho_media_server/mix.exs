@@ -23,9 +23,7 @@ defmodule NinhoMediaServer.MixProject do
   defp deps do
     [
       {:plug, "~> 1.14.2"},
-      {:plug_cowboy, "~> 2.6.1"},
-      {:nx, "~> 0.6.4"},
-      {:evision, "~> 0.1.33"}
+      {:plug_cowboy, "~> 2.6.1"}
     ]
   end
 end
